@@ -7,6 +7,7 @@ import '../../features/budget/data/models/budget_model.dart';
 import '../../features/budget/data/repositories/budget_repository_impl.dart';
 import '../../features/budget/domain/repositories/budget_repository.dart';
 import '../../features/budget/domain/usecases/get_budget.dart';
+import '../../features/budget/domain/usecases/set_budget.dart';
 import '../../features/budget/presentation/bloc/budget_bloc.dart';
 import '../../features/transaction/data/datasources/transaction_local_datasource.dart';
 import '../../features/transaction/data/datasources/transaction_remote_datasource.dart';

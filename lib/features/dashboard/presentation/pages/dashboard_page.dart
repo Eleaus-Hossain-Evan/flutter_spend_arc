@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 
+import '../../../../core/di/injection_container.dart';
 import '../../../budget/presentation/bloc/budget_bloc.dart';
 import '../../../budget/presentation/bloc/budget_event.dart';
 import '../../../budget/presentation/bloc/budget_state.dart';
@@ -10,6 +10,7 @@ import '../../../transaction/presentation/bloc/transaction_event.dart';
 import '../../../transaction/presentation/bloc/transaction_state.dart';
 import '../../../transaction/presentation/pages/add_transaction_page.dart';
 import '../widgets/arc_meter_painter.dart';
+import '../widgets/particle_burst_overlay.dart';
 import '../widgets/spending_line_chart_painter.dart';
 
 class DashboardPage extends StatelessWidget {
@@ -31,12 +32,10 @@ class DashboardPage extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) =>
-              GetIt.instance<TransactionBloc>()..add(const LoadTransactions()),
+          create: (_) => sl<TransactionBloc>()..add(const LoadTransactions()),
         ),
         BlocProvider(
-          create: (_) =>
-              GetIt.instance<BudgetBloc>()..add(const LoadBudget()),
+          create: (_) => sl<BudgetBloc>()..add(const LoadBudget()),
         ),
       ],
       child: _DashboardContent(showAddTransaction: _showAddTransaction),
@@ -44,10 +43,18 @@ class DashboardPage extends StatelessWidget {
   }
 }
 
-class _DashboardContent extends StatelessWidget {
+class _DashboardContent extends StatefulWidget {
   final void Function(BuildContext) showAddTransaction;
 
   const _DashboardContent({required this.showAddTransaction});
+
+  @override
+  State<_DashboardContent> createState() => _DashboardContentState();
+}
+
+class _DashboardContentState extends State<_DashboardContent> {
+  int _previousTxCount = -1;
+  int _burstCount = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +88,7 @@ class _DashboardContent extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => showAddTransaction(context),
+        onPressed: () => widget.showAddTransaction(context),
         child: const Icon(Icons.add),
       ),
     );
@@ -101,7 +108,23 @@ class _DashboardContent extends StatelessWidget {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ArcMeterWidget(percentage: state.percentage),
+              BlocBuilder<TransactionBloc, TransactionState>(
+                builder: (context, txState) {
+                  final txCount = txState is TransactionLoaded
+                      ? txState.transactions.length
+                      : 0;
+                  if (_previousTxCount >= 0 &&
+                      state.isUnderBudget &&
+                      txCount > _previousTxCount) {
+                    _burstCount++;
+                  }
+                  _previousTxCount = txCount;
+                  return ParticleBurstOverlay(
+                    burstKey: _burstCount,
+                    child: ArcMeterWidget(percentage: state.percentage),
+                  );
+                },
+              ),
               const SizedBox(height: 8),
               Text(
                 '\$${state.spent.toStringAsFixed(0)} / ${state.budget.formattedLimit}',

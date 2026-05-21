@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/usecases/usecase.dart';
 import '../../../transaction/presentation/bloc/transaction_state.dart';
-import '../../domain/usecases/get_budget.dart' hide SetBudget;
+import '../../domain/usecases/get_budget.dart';
 import '../../domain/usecases/set_budget.dart';
 import 'budget_event.dart';
 import 'budget_state.dart';
