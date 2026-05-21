@@ -3,14 +3,13 @@ import 'package:dartz/dartz.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../../domain/repositories/transaction_repository.dart';
-import '../entities/transaction.dart';
 
-class GetTransactions implements UseCase<List<Transaction>, NoParams> {
+class SyncTransactions implements UseCase<Unit, NoParams> {
   final TransactionRepository repository;
 
-  GetTransactions(this.repository);
+  SyncTransactions(this.repository);
 
   @override
-  Future<Either<Failure, List<Transaction>>> call(NoParams params) =>
-      repository.getTransactions();
+  Future<Either<Failure, Unit>> call(NoParams params) =>
+      repository.syncPendingTransactions();
 }

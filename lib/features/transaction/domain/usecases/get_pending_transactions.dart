@@ -5,12 +5,12 @@ import '../../../../core/usecases/usecase.dart';
 import '../../domain/repositories/transaction_repository.dart';
 import '../entities/transaction.dart';
 
-class GetTransactions implements UseCase<List<Transaction>, NoParams> {
+class GetPendingTransactions implements UseCase<List<Transaction>, NoParams> {
   final TransactionRepository repository;
 
-  GetTransactions(this.repository);
+  GetPendingTransactions(this.repository);
 
   @override
   Future<Either<Failure, List<Transaction>>> call(NoParams params) =>
-      repository.getTransactions();
+      repository.getPendingTransactions();
 }
